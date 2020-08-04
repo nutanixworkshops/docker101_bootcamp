@@ -1,4 +1,4 @@
-.. title:: Introduction to Nutanix AHV
+.. title:: Introduction to Docker
 
 .. toctree::
   :maxdepth: 2
@@ -6,246 +6,99 @@
   :name: _labs
   :hidden:
 
-  examplelab1/examplelab1
-  examplelab2/examplelab2
-
-.. toctree::
-  :maxdepth: 2
-  :caption: Optional Labs
-  :name: _optional_labs
-  :hidden:
-
-  examplelab3/examplelab3
-
-.. toctree::
-  :maxdepth: 2
-  :caption: Appendix
-  :name: _appendix
-  :hidden:
-
-  tools_vms/windows_tools_vm
-  tools_vms/linux_tools_vm
-  appendix/glossary
-  appendix/otherstuff
+  containers/containers
+  day1/day1
+  day2/day2
+  day3/day3
+  day4/day4
+  day5/day5
+  day6/day6
+  day7/day7
 
 .. _getting_started:
 
----------------
-Getting Started
----------------
+---------------------
+Scenario introduction
+---------------------
+Welcome to a day in the life of an administrator called John. John is working for an organization that is thinking about if it would be possible to put one of their applications, a NGINX Load balancer and some NGINX based web servers into a container based workload. Today the application consists of Virtual Machines based on the Linux Distribution Ubuntu 18.04 LTS.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed velit odio, ultrices sed elementum vitae, dictum eget turpis. Etiam ultrices orci quis tempus tempus. Nulla non nibh imperdiet, suscipit risus quis, eleifend nisl. Morbi at posuere nibh, quis bibendum dui. Morbi dictum sem a ipsum bibendum condimentum. Suspendisse id ante gravida, efficitur leo a, consequat enim. Suspendisse tempor lorem vel purus scelerisque, vel facilisis lorem consequat. Pellentesque augue orci, iaculis vel mollis sit amet, scelerisque a tellus. Aliquam commodo in lectus feugiat porta.
+.. _requirements:
 
-What's New
-++++++++++
+Requirements
+++++++++++++
 
-- Workshop updated for the following software versions:
-    - AOS & PC 5.11
+John has been asked to investigate the following set requirements by the organization:
 
-- Optional Lab Updates:
+#. Containerization using Docker.
+#. Should be able to be “transported” to cloud platforms like AWS and GCP.
+#. Changing the configuration should be outside of the container, if it can be done.
+#. Changes to configuration and the web application should not be lost in case of a restart/reboot of the container
+#. A reboot of the host that serves the container should not impact the accessibility of the containerized web servers (read application).
+#. Update to the containers must have:
+   
+   #. A fall back path
+   #. No impact on application delivery
 
-- Added :ref:`example_lab_3`
+#. Stretched goal: deployment of the containers, when there is an update, gets automated.
 
-Agenda
-++++++
+John has no to little experience with containers and wants this investigation to also help him in getting a better understanding of containers and the workloads that can be used in this world.
+To support John in his quest he has created a path to get his knowledge up and running in small steps. The path he created looks like this:
 
-- Introductions
-- Nutanix Technology Overview
-- Nutanix Configuration
-- Deploying and Managing Workloads
-- Security Compliance
-- Monitoring and Managing the Environment
+- What are containers?
+- For what workloads can I use it and would it fit the set request?
+- What the pre-requirements to get started with Docker?
+- Can I use pre-build containers that are out there, if any?
+- How can I create my own containers if the prebuilt are not solving my issues?
+- How can I make the solution for LB and 1 container?
+- How can I make the solution scale?
+- How can I deploy new containers after there has been an update? (stretched goal)
 
-Introductions
-+++++++++++++
-
-- Name
-- Familiarity with Nutanix
-
-Initial Setup
-+++++++++++++
-
-- Take note of the *Passwords* being used.
-- Log into your virtual desktops (connection info below)
-
-Environment Details
-+++++++++++++++++++
-
-Nutanix Workshops are intended to be run in the Nutanix Hosted POC environment. Your cluster will be provisioned with all necessary images, networks, and VMs required to complete the exercises.
-
-Networking
-..........
-
-Hosted POC clusters follow a standard naming convention:
-
-- **Cluster Name** - POC\ *XYZ*
-- **Subnet** - 10.**21**.\ *XYZ*\ .0
-- **Cluster IP** - 10.**21**.\ *XYZ*\ .37
-
-If provisioned from the marketing pool:
-
-- **Cluster Name** - MKT\ *XYZ*
-- **Subnet** - 10.**20**.\ *XYZ*\ .0
-- **Cluster IP** - 10.**20**.\ *XYZ*\ .37
-
-For example:
-
-- **Cluster Name** - POC055
-- **Subnet** - 10.21.55.0
-- **Cluster IP** - 10.21.55.37
-
-Throughout the Workshop there are multiple instances where you will need to substitute *XYZ* with the correct octet for your subnet, for example:
-
-.. list-table::
-   :widths: 25 75
-   :header-rows: 1
-   * - IP Address
-     - Description
-   * - 10.21.\ *XYZ*\ .37
-     - Nutanix Cluster Virtual IP
-   * - 10.21.\ *XYZ*\ .39
-     - **PC** VM IP, Prism Central
-   * - 10.21.\ *XYZ*\ .40
-     - **DC** VM IP, NTNXLAB.local Domain Controller
-
-Each cluster is configured with 2 VLANs which can be used for VMs:
-
-.. list-table::
-  :widths: 25 25 10 40
-  :header-rows: 1
-  * - Network Name
-    - Address
-    - VLAN
-    - DHCP Scope
-  * - Primary
-    - 10.21.\ *XYZ*\ .1/25
-    - 0
-    - 10.21.\ *XYZ*\ .50-10.21.\ *XYZ*\ .124
-  * - Secondary
-    - 10.21.\ *XYZ*\ .129/25
-    - *XYZ1*
-    - 10.21.\ *XYZ*\ .132-10.21.\ *XYZ*\ .253
-
-Credentials
-...........
+This workshop is showing you how John steps through most of the set items in his path... 
 
 .. note::
-
-  The *<Cluster Password>* is unique to each cluster and will be provided by the leader of the Workshop.
-
-.. list-table::
-   :widths: 25 35 40
-   :header-rows: 1
-   * - Credential
-     - Username
-     - Password
-   * - Prism Element
-     - admin
-     - *<Cluster Password>*
-   * - Prism Central
-     - admin
-     - *<Cluster Password>*
-   * - Controller VM
-     - nutanix
-     - *<Cluster Password>*
-   * - Prism Central VM
-     - nutanix
-     - *<Cluster Password>*
-
-Each cluster has a dedicated domain controller VM, **DC**, responsible for providing AD services for the **NTNXLAB.local** domain. The domain is populated with the following Users and Groups:
-
-.. list-table::
-   :widths: 25 35 40
-   :header-rows: 1
-   * - Group
-     - Username(s)
-     - Password
-   * - Administrators
-     - Administrator
-     - nutanix/4u
-   * - SSP Admins
-     - adminuser01-adminuser25
-     - nutanix/4u
-   * - SSP Developers
-     - devuser01-devuser25
-     - nutanix/4u
-   * - SSP Consumers
-     - consumer01-consumer25
-     - nutanix/4u
-   * - SSP Operators
-     - operator01-operator25
-     - nutanix/4u
-   * - SSP Custom
-     - custom01-custom25
-     - nutanix/4u
-   * - Bootcamp Users
-     - user01-user25
-     - nutanix/4u
-
-Access Instructions
-+++++++++++++++++++
-
-The Nutanix Hosted POC environment can be accessed a number of different ways:
-
-Lab Access User Credentials
-...........................
-
-PHX Based Clusters:
-**Username:** PHX-POCxxx-User01 (up to PHX-POCxxx-User20), **Password:** *<Provided by Instructor>*
-
-RTP Based Clusters:
-**Username:** RTP-POCxxx-User01 (up to RTP-POCxxx-User20), **Password:** *<Provided by Instructor>*
-
-Frame VDI
-.........
-
-Login to: https://frame.nutanix.com/x/labs
-
-**Nutanix Employees** - Use your **NUTANIXDC** credentials
-**Non-Employees** - Use **Lab Access User** Credentials
-
-Parallels VDI
-.................
-
-PHX Based Clusters Login to: https://xld-uswest1.nutanix.com
-
-RTP Based Clusters Login to: https://xld-useast1.nutanix.com
-
-**Nutanix Employees** - Use your **NUTANIXDC** credentials
-**Non-Employees** - Use **Lab Access User** Credentials
-
-Employee Pulse Secure VPN
-..........................
-
-Download the client:
-
-PHX Based Clusters Login to: https://xld-uswest1.nutanix.com
-
-RTP Based Clusters Login to: https://xld-useast1.nutanix.com
-
-**Nutanix Employees** - Use your **NUTANIXDC** credentials
-**Non-Employees** - Use **Lab Access User** Credentials
-
-Install the client.
-
-In Pulse Secure Client, **Add** a connection:
-
-For PHX:
-
-- **Type** - Policy Secure (UAC) or Connection Server
-- **Name** - X-Labs - PHX
-- **Server URL** - xlv-uswest1.nutanix.com
-
-For RTP:
-
-- **Type** - Policy Secure (UAC) or Connection Server
-- **Name** - X-Labs - RTP
-- **Server URL** - xlv-useast1.nutanix.com
+  The workshop can be run fully from your own laptop as it is not using any Nutanix related features. It is built to let you get familiar with Docker and Docker Swarm. The total amount of time for the workshop is a full day.
+  Commands that need to be run are in **bold** so you can keep track and find them easily.
 
 
-Nutanix Version Info
-++++++++++++++++++++
+Agenda
+++++++++++
 
-- **AHV Version** - AHV 20170830.337
-- **AOS Version** - 5.11.2.3
-- **PC Version** - 5.11.2.1
+- What are containers?
+- Day 1 - General Docker
+
+  + Needed resources to build the test environment
+  + Installing Docker
+  + Run first container
+  + Container management
+  + Docker usefull commands
+
+- Day 2 - Advanced Docker
+
+  + Change and create images/containers
+
+- Day 3 - More advanced Docker
+
+  + Detach files from conatiner images
+
+- Day 4 - Connect containers together
+
+  + Creating a loadbalancer
+  + Creating Dockerfile
+
+- Day 5 - Storing images and create a HA solution
+
+  + Store images
+  + Start of Docker Swarm
+
+- Day 6 - Dockerfile and changing images with Docker Swarm
+
+  + Create a new Dockerfile
+  + Store the created images
+  + Testing failures
+
+- Day 7 - Scaling,rebalancing and Monitoring
+
+  + Scale the applications
+  + Rebalance the containers
+  + Monitor the test environment
+
