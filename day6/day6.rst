@@ -2,7 +2,7 @@
 .. title:: Introduction to Docker
 
 .. note::
-   Estimated amount of time: **120 minutes**
+   Estimated amount of time: ``120 minutes``
 
 Day 6 - Dockerfile and changing images with Docker Swarm
 ========================================================
@@ -22,7 +22,7 @@ John does some research on a small container and almost every time he sees that 
 
 Creating a nginx image with php included
 ........................................
-After having his test environment started and tested to see that the mater and the two workers are active using **docker node ls** on the master, John is going to use two articles that he found on the internet to have his Alpine NGINX and PHP image. The two sites are:
+After having his test environment started and tested to see that the mater and the two workers are active using ``docker node ls`` on the master, John is going to use two articles that he found on the internet to have his Alpine NGINX and PHP image. The two sites are:
 
 #. https://wiki.alpinelinux.org/wiki/Nginx_with_PHP
 #. https://blog.ruanbekker.com/blog/2017/08/27/building-a-alpine-nginx-php-fpm-image-on-docker-for-php-applications/
@@ -99,7 +99,7 @@ He also created the other files that were mentioned in the articles. The total D
 
 .. figure:: images/1.png
 
-After he has all the needed data, he starts the build using docker build and also adds tags so he can upload the images into his repository he created earlier this week. The command he uses is **docker build -t dev1johndoe/alpine_nginx_php:1.0 -t dev1johndoe/alpine_nginx_php:latest .** During the build process he sees an issue. Php-fpm5 is a package that is not existing for the Alpine 3.11 (the version that is being used). He changes all the **references from php5 to php7** in the Dockerfile.
+After he has all the needed data, he starts the build using docker build and also adds tags so he can upload the images into his repository he created earlier this week. The command he uses is ``docker build -t dev1johndoe/alpine_nginx_php:1.0 -t dev1johndoe/alpine_nginx_php:latest .`` During the build process he sees an issue. Php-fpm5 is a package that is not existing for the Alpine 3.11 (the version that is being used). He changes all the ``references from php5 to php7`` in the Dockerfile.
 
 He then rebuilds the image using the same tags. The build has been successfully completed. After the build, John is eager to test his new image out. 
 
@@ -107,9 +107,9 @@ He then rebuilds the image using the same tags. The build has been successfully 
 Test the new image Alpine nginx/php
 ...................................
 
-John runs the **docker run -it --name anp --rm dev1johndoe/alpine_nginx_php:latest** command and sees that it instantly crashes. The system cannot find the php-fpm7 it seems. “Hmmm how can I test?? I need a process that is running constantly otherwise the container will stop and not have anything I can attach to...”. John changes the wrapper.sh, as that is the file that is being called by the start of the cluster, as that is showing **CMD [“/wrapper.sh”]**. He changes it to **CMD ["/bin/sh"]** and saves the file. He then rebuilds the image and starts the container again using **docker run -it --name anp --rm dev1johndoe/alpine_nginx_php:latest**. 
+John runs the ``docker run -it --name anp --rm dev1johndoe/alpine_nginx_php:latest`` command and sees that it instantly crashes. The system cannot find the php-fpm7 it seems. “Hmmm how can I test?? I need a process that is running constantly otherwise the container will stop and not have anything I can attach to...”. John changes the wrapper.sh, as that is the file that is being called by the start of the cluster, as that is showing ``CMD [“/wrapper.sh”]``. He changes it to ``CMD ["/bin/sh"]`` and saves the file. He then rebuilds the image and starts the container again using ``docker run -it --name anp --rm dev1johndoe/alpine_nginx_php:latest``. 
 
-After the start he gets a command prompt and runs **find /* -name php-fpm7** to search for the location of the php-fpm7 binary. He sees that the location is *not the same as the start_php-fpm7.sh script*. He changes the script to reflect the correct location and reruns the build command and also *reverts back to the original wrapper.sh* script and changes the files and references to php5 in the files. He changes the following files:
+After the start he gets a command prompt and runs ``find /* -name php-fpm7`` to search for the location of the php-fpm7 binary. He sees that the location is *not the same as the start_php-fpm7.sh script*. He changes the script to reflect the correct location and reruns the build command and also *reverts back to the original wrapper.sh* script and changes the files and references to php5 in the files. He changes the following files:
 
 #. Dockerfile
 #. start_php-fpm5.php and renamed to start_php-fpm7.php
@@ -123,11 +123,11 @@ Download the files here:
 - start_php-fpm7.sh :download:`start_php-fpm7.sh`
 - alpine_nginx.conf :download:`alpine_nginx.conf`
   
-He saves the file and runs the **docker run** command again. Now he sees that the logs are showing that php-fpm7 and nginx are starting and are ok.
+He saves the file and runs the ``docker run`` command again. Now he sees that the logs are showing that php-fpm7 and nginx are starting and are ok.
 
 .. figure:: images/2.png
 
-He cancelled his session using **<CTRL>+C** and dropped back to his machines prompt. Also the container has been removed automatically as he expected as he used the *--rm* parameter in the **docker run** command. Ok now let’s see if everything works. 
+He cancelled his session using ``<CTRL>+C`` and dropped back to his machines prompt. Also the container has been removed automatically as he expected as he used the *--rm* parameter in the ``docker run`` command. Ok now let’s see if everything works. 
 
 In his */home/john/www* directory on the swarm-docker-master he creates a file called *index.php* and the content of the file is:
 
@@ -169,7 +169,7 @@ In his */home/john/www* directory on the swarm-docker-master he creates a file c
     </html>
 
 He saves the file and starts a container with the image. Now as he needs to get the data external from the container he is using the *-v* parameter. He remembers seeing that the configuration of the nginx.conf has a different location than the default location for the HTML files. /www seems to be the root of the nginx server. The docker command he uses is:
-**docker run -d --name anp --rm -v /home/john/www/:/www -p 81:80 dev1johndoe/alpine_nginx_php:latest** . He also changes the port to 81 as port 80 has been taken by the load balancer. He hits the Enter Key and the command is returning a UUID for the container.
+``docker run -d --name anp --rm -v /home/john/www/:/www -p 81:80 dev1johndoe/alpine_nginx_php:latest`` . He also changes the port to 81 as port 80 has been taken by the load balancer. He hits the Enter Key and the command is returning a UUID for the container.
 
 .. figure:: images/3.png
 
@@ -179,13 +179,13 @@ He opens the browser and types \http://192.168.1.157:81/index.php (the IP addres
 
 If he forgets the index.php in the URL, nginx will automatically show the normal page that also the three nodes are showing. Reason is that in the nginx.conf file, index.html is defined before the index.php. John follows these steps to make sure that index.php is opened BEFORE index.html:
 
-1. stop the docker container using **docker stop anp**
+1. stop the docker container using ``docker stop anp``
 2. changes the order in his alpine_nginx.conf file
 
    .. figure:: images/5.png
 
-3. rebuild the image using **docker build -t dev1johndoe/alpine_nginx_php:1.0 -t dev1johndoe/alpine_nginx_php:latest .**
-4. redeploy a container using the new image using **docker run -d --name anp --rm -v /home/john/www/:/www -p 81:80 dev1johndoe/alpine_nginx_php:latest**
+3. rebuild the image using ``docker build -t dev1johndoe/alpine_nginx_php:1.0 -t dev1johndoe/alpine_nginx_php:latest .``
+4. redeploy a container using the new image using ``docker run -d --name anp --rm -v /home/john/www/:/www -p 81:80 dev1johndoe/alpine_nginx_php:latest``
 
 So he made it through all the steps and opens the browser. Yes that is what he was looking for:
 
@@ -198,12 +198,12 @@ Push the new nginx image
 
 Now that John has the new image and it is working he pushes the image to his docker hub so it can be used in the future. One reason he needs to push this to the repository is because the next step is to get the container started with the new image in the docker swarm he has running.
 
-John uses the command **docker login** to get his session connected into the docker hub repo.
+John uses the command ``docker login`` to get his session connected into the docker hub repo.
 As John already has logged in before, the command uses the store credentials
 
 .. figure:: images/7.png
 
-By using the command **docker push dev1johndoe/alpine_nginx_php:latest** (name of the image) the image is pushed onto his repo...
+By using the command ``docker push dev1johndoe/alpine_nginx_php:latest`` (name of the image) the image is pushed onto his repo...
 
 .. figure:: images/8.png
 
@@ -220,15 +220,15 @@ John checks on the swarm-docker-m VM, to see that all his nodes are up and runni
 
 .. figure:: images/10.png
 
-John canes the common, he used earlier, to start the three containers as a service using the new image. **docker service create --mount 'type=volume,volume-opt=o=addr=192.168.1.220,volume-opt=device=:/www,volume-opt=type=nfs,source=nfs_nginx,target=/www,volume-nocopy=true' --replicas=3 --name swarm_nginx_php --publish mode=host,target=80,published=8081 dev1johndoe/alpine_nginx_php**. The new containers must listen on another port as the port 8080 is already in use by the other containers.
+John canes the common, he used earlier, to start the three containers as a service using the new image. ``docker service create --mount 'type=volume,volume-opt=o=addr=192.168.1.220,volume-opt=device=:/www,volume-opt=type=nfs,source=nfs_nginx,target=/www,volume-nocopy=true' --replicas=3 --name swarm_nginx_php --publish mode=host,target=80,published=8081 dev1johndoe/alpine_nginx_php``. The new containers must listen on another port as the port 8080 is already in use by the other containers.
 
 .. figure:: images/11.png
 
-He runs the command and sees the message **verify: Service converged**. The service is running on the nodes...
+He runs the command and sees the message ``verify: Service converged``. The service is running on the nodes...
 
 .. figure:: images/12.png
 
-Let’s check; John runs **docker ps** and sees that on his master the container is running and listening on port 8081.
+Let’s check; John runs ``docker ps`` and sees that on his master the container is running and listening on port 8081.
 
 .. figure:: images/13.png
 
@@ -236,7 +236,7 @@ Checking the browser on the URL of his master John sees:
 
 .. figure:: images/14.png
 
-So the Docker Swarm seems to have the containers running. Let’s check using **docker service ps swarm_nginx_php**
+So the Docker Swarm seems to have the containers running. Let’s check using ``docker service ps swarm_nginx_php``
 
 .. figure:: images/15.png
 
@@ -245,7 +245,7 @@ All the nodes in the Docker Swarm are running the container and listen on port 8
 Change the load balancer to use the new containers
 ..................................................
 
-Now that the Docker Swarm is running the containers on port 8081, and all three are active, the configuration of the load balancer needs to reflect these new containers. John changes the configuration file of nginx and his mounted NFS server (**/home/john/www/nginx/conf.d/default.conf**) to use the new containers and corresponding ports. The content of the file now is showing:
+Now that the Docker Swarm is running the containers on port 8081, and all three are active, the configuration of the load balancer needs to reflect these new containers. John changes the configuration file of nginx and his mounted NFS server (``/home/john/www/nginx/conf.d/default.conf``) to use the new containers and corresponding ports. The content of the file now is showing:
 
 .. code-block:: bash
 
@@ -262,11 +262,11 @@ Now that the Docker Swarm is running the containers on port 8081, and all three 
         }
     }
 
-He reloads the configuration file of the load balancer by rerunning the same command he used earlier **docker exec -ti swarm_nginx_lb.1.$(docker service ps -f 'name=swarm_nginx_lb.1' swarm_nginx_lb -q --no-trunc | head -n1) nginx -s reload**. 
+He reloads the configuration file of the load balancer by rerunning the same command he used earlier ``docker exec -ti swarm_nginx_lb.1.$(docker service ps -f 'name=swarm_nginx_lb.1' swarm_nginx_lb -q --no-trunc | head -n1) nginx -s reload``. 
 
 .. figure:: images/16.png
 
-He then runs **docker exec -ti swarm_nginx_lb.1.$(docker service ps -f 'name=swarm_nginx_lb.1' swarm_nginx_lb -q --no-trunc | head -n1) tail -f /var/log/nginx/access_lb.log** to see if the load balance is using the new configuration.
+He then runs ``docker exec -ti swarm_nginx_lb.1.$(docker service ps -f 'name=swarm_nginx_lb.1' swarm_nginx_lb -q --no-trunc | head -n1) tail -f /var/log/nginx/access_lb.log`` to see if the load balance is using the new configuration.
 
 .. figure:: images/17.png
 
@@ -286,7 +286,7 @@ After a quick Google search he found this article that describes how to add a Ma
 #. Install Docker on the new servers
 #. Add the nodes to the swarm as a master using the command described in the article
 
-John runs the command he found from the article, **docker swarm join-token manager** to get the command that needs to be run on the other masters.
+John runs the command he found from the article, ``docker swarm join-token manager`` to get the command that needs to be run on the other masters.
 
 .. figure:: images/18.png
 
@@ -294,11 +294,11 @@ John runs the command on two new swarm masters and sees that the new machines ha
 
 .. figure:: images/19.png
 
-The command **docker node ls** as shows that the node is added as a master and that it is reachable.
+The command ``docker node ls`` as shows that the node is added as a master and that it is reachable.
 
 .. figure:: images/20.png
 
-John reads that the **docker node ls** command can not be run on a node. As he wants to test whatever is possible to make sure what he reads is right he runs that command **docker node ls**, on one of the nodes and gets the error message as described in what he read...
+John reads that the ``docker node ls`` command can not be run on a node. As he wants to test whatever is possible to make sure what he reads is right he runs that command ``docker node ls``, on one of the nodes and gets the error message as described in what he read...
 
 .. figure:: images/21.png
 
@@ -320,15 +320,15 @@ John has set the following tests to be run and documented:
 
 Test 1 - Fail one master
 ^^^^^^^^^^^^^^^^^^^^^^^^
-John is using the first master to see what happens to the web server if one master dies. He stops the docker services on the machine using the command **service docker stop**. As the command can only be run as root, he needs to provide his password to make the command work.
+John is using the first master to see what happens to the web server if one master dies. He stops the docker services on the machine using the command ``service docker stop``. As the command can only be run as root, he needs to provide his password to make the command work.
 
 .. figure:: images/23.png
 
-John then runs the command **docker ps** and gets the error message is the docker daemon running?
+John then runs the command ``docker ps`` and gets the error message is the docker daemon running?
 
 .. figure:: images/24.png
 
-Running the command **docker service ps swarm_nginx_lb**, John sees that the service has been pushed onto another server. In this case also a master.
+Running the command ``docker service ps swarm_nginx_lb``, John sees that the service has been pushed onto another server. In this case also a master.
 
 .. figure:: images/25.png
 
@@ -336,12 +336,12 @@ Test 2 - Fail two masters
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 John leaves the master down and shuts down the second master M2 by stopping the docker services.
-On the remaining node of the Docker Swarm he runs **watch docker node ls** and gets an error: 
+On the remaining node of the Docker Swarm he runs ``watch docker node ls`` and gets an error: 
 
 .. figure:: images/26.png
 
 .. note::
-    The process **watch docker node ls** is kept running on the master from Test 2
+    The process ``watch docker node ls`` is kept running on the master from Test 2
 
 Ok so more than half of the masters must be running! Aha good to know!
 
@@ -357,14 +357,14 @@ After having all the masters back online he sees that in the watch command all n
 Test 3 - Stop a worker node
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-John is repeating the test with one of the worker nodes he has to see the outcome. He *stops the docker service* on the first node **swarm-docker-w1** and looks to see what happens. As soon as he stopped the services in his watch docker service he saw that the service has been restarted on another node... The process on swarm-docker-w1 has been shutdown and restarted on docker-swarm-m3
+John is repeating the test with one of the worker nodes he has to see the outcome. He *stops the docker service* on the first node ``swarm-docker-w1`` and looks to see what happens. As soon as he stopped the services in his watch docker service he saw that the service has been restarted on another node... The process on swarm-docker-w1 has been shutdown and restarted on docker-swarm-m3
 
 .. figure:: images/29.png
 
 Test 4 - Stop two workers
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-John reruns the **service docker stop** command on the second worker and sees again that the service is started on another node.
+John reruns the ``service docker stop`` command on the second worker and sees again that the service is started on another node.
 
 .. figure:: images/30.png
 
